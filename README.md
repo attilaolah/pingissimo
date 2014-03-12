@@ -33,5 +33,7 @@ some more features, like:
 * `POST` payload support
 * Using the Datastore to persist all jobs, and have a single cron that executes them
 * ICMP message support (using outbound sockets)
+* User accounts with a dashboard and ping/latency history
+* Email alerts on failure
 
 I might implement these when/if I need them. Feel free to fork and help out.
