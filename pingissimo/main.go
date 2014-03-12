@@ -3,6 +3,7 @@ package pingissimo
 
 import (
 	"net/http"
+	"strings"
 
 	"appengine"
 
@@ -23,7 +24,12 @@ func init() {
 
 func pingHandler(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
-	ok, err := ping.Ping(c, r.URL)
+	parts := strings.Split(r.URL.Path, "/")
+	method := strings.ToUpper(parts[len(parts)-1])
+	if method == "PING" {
+		method = "HEAD"
+	}
+	ok, err := ping.Ping(c, method, r.URL.Query()["url"]...)
 	if !ok {
 		w.WriteHeader(http.StatusBadRequest)
 		return

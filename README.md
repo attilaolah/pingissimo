@@ -10,11 +10,11 @@ To ping websites, simply add cron entries to `cron.yaml`, like this:
 
 ```yaml
 cron:
-- description: Ping MyApp every minute
+- description: HEAD Example every minute
   url: /ping?url=http://www.example.com
   schedule: every 1 minutes
-- description: POST to MyApp every two hours
-  url: /ping/post?url=http://www.example.com
+- description: POST MyApp and Example every two hours
+  url: /ping/post?url=https://www.myapp.com&url=http://www.example.com
   schedule: every 2 hours
 ```
 

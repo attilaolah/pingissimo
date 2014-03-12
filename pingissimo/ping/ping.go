@@ -3,27 +3,35 @@ package ping
 
 import (
 	"net/http"
-	"net/url"
-	"strings"
+	"sync"
 
 	"appengine"
 	"appengine/urlfetch"
 )
 
-func Ping(c appengine.Context, u *url.URL) (ok bool, err error) {
-	parts := strings.Split(u.Path, "/")
-	method := strings.ToUpper(parts[len(parts)-1])
-	if method == "PING" {
-		method = "HEAD"
+func Ping(c appengine.Context, method string, urls ...string) (ok bool, err error) {
+	reqs := make([]*http.Request, len(urls))
+	for i, u := range urls {
+		if reqs[i], err = http.NewRequest(method, u, nil); err != nil {
+			ok = false
+			return
+		}
 	}
-	req, err := http.NewRequest(method, u.Query().Get("url"), nil)
-	if err != nil {
-		return
+	var wg sync.WaitGroup
+	defer wg.Wait()
+	wg.Add(len(reqs))
+	for i, r := range reqs {
+		go func(r *http.Request, i int) {
+			defer wg.Done()
+			c.Infof("[%d] %s %s %s", i, r.Proto, r.Method, r.URL.String())
+			if resp, rerr := urlfetch.Client(c).Do(r); err == nil {
+				c.Infof("[%d] %s %s", i, resp.Proto, resp.Status)
+			} else {
+				c.Errorf("[%d] %s", i, err)
+				err = rerr
+			}
+		}(r, i+1)
 	}
 	ok = true
-	c.Infof("%s %s %s", req.Proto, req.Method, req.URL.String())
-	if resp, err := urlfetch.Client(c).Do(req); err == nil {
-		c.Infof("%s %s", resp.Proto, resp.Status)
-	}
 	return
 }
