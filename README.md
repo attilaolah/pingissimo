@@ -1,4 +1,4 @@
-# Pingissimo ![Public Domain](https://pypip.in/license/intperm/badge.png)
+# Pingissimo
 
 A dead-simple Google App Engine application scaffold that can be used
 out-of-the-box for periodically pinging websites. Just create a Google App
